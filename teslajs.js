@@ -332,7 +332,7 @@ exports.refreshToken = function refreshToken(refresh_token, callback) {
     }
 
     var req = {
-        method: 'POST',
+        method: 'GET',
         url: portalBaseURI + '/oauth/token',
         body: {
             "grant_type": "refresh_token",
@@ -373,7 +373,7 @@ exports.logout = function logout(authToken, callback) {
     callback = callback || function (err, result) { /* do nothing! */ }
 
     request({
-        method: 'POST',
+        method: 'GET',
         url: portalBaseURI + '/oauth/revoke',
         headers: { Authorization: "Bearer " + authToken, 'Content-Type': 'application/json; charset=utf-8' }
     }, function (error, response, body) {
@@ -562,7 +562,7 @@ function get_command(options, command, callback) {
 exports.get_commandAsync = Promise.denodeify(exports.get_command);
 
 /**
- * Generic REST call for POST commands
+ * Generic REST call for GET commands
  * @function
  * @param {optionsType} options - options object
  * @param {string} command - REST command
@@ -571,13 +571,14 @@ exports.get_commandAsync = Promise.denodeify(exports.get_command);
  */
 exports.post_command = post_command;
 function post_command(options, command, body, callback) {
-    log(API_CALL_LEVEL, "POST call: " + command + " start.");
+    log(API_CALL_LEVEL, "GET call: " + command + " start.");
 
     callback = callback || function (err, data) { /* do nothing! */ }
+    var u = new URLSearchParams(body).toString();
 
     var cmd = {
-        method: "POST",
-        url: portalBaseURI + command,
+        method: "GET",
+        url: portalBaseURI + command + '?' + u,
         headers: { "X-SSL-Client-S-CN": process.env.VIN },
         body: body || null
     };
@@ -604,16 +605,16 @@ function post_command(options, command, body, callback) {
 
             callback(null, body);
         } catch (e) {
-            log(API_ERR_LEVEL, 'Error parsing POST call response');
+            log(API_ERR_LEVEL, 'Error parsing GET call response');
             callback(e, null);
         }
 
-        log(API_RETURN_LEVEL, "\nPOST command: " + command + " completed.");
+        log(API_RETURN_LEVEL, "\nGET command: " + command + " completed.");
     });
 }
 
 /**
- * Generic Async REST call for POST commands
+ * Generic Async REST call for GET commands
  * @function post_commandAsync
  * @param {optionsType} options - options object
  * @param {string} command - REST command
