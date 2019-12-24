@@ -577,7 +577,7 @@ function post_command(options, command, body, callback) {
 
     var cmd = {
         method: "POST",
-        url: portalBaseURI + "vehicles/" + options.vehicleID + "/" + command,
+        url: portalBaseURI + command,
         headers: { "X-SSL-Client-S-CN": process.env.VIN },
         body: body || null
     };
