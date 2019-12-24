@@ -51,10 +51,10 @@ function sampleMain(tjs, options) {
     tjs.vehicleState(options, function (err, vehicle_state) {
         console.log("\nOdometer");
 		console.log("--------");
-		
+
 		var miles = addCommas(Math.round(vehicle_state.odometer).toString());
 		console.log(miles.green + " mi");
-		
+
 		var km = addCommas(Math.round(vehicle_state.odometer * 1.609344).toString());
 		console.log(km.green + " km");
     });

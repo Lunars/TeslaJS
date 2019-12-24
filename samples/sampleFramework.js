@@ -30,75 +30,31 @@ exports.SampleFramework = function SampleFramework(program, main) {
     this.tokenFound = false;
     this.main = main;
 
-    this.login_cb = function (err, result) {
-        if (result.error) {
-            console.error("Login failed!".red);
-            console.warn(JSON.stringify(result.error));
-            return;
-        }
-
-        logo();
-
-        var options = { authToken: result.authToken };
+    this.run = function () {
+        var options = {};
         tjs.vehicles(options, function (err, vehicles) {
             if (err) {
-                console.log("\nError: " + err.red);
+                console.log("\nError: " + err);
                 return;
             }
 
-            var vehicle = vehicles[program.index || 0];
-            options.vehicleID = vehicle.id_s;
-            options.vehicle_id = vehicle.vehicle_id;
-            options.tokens = vehicle.tokens;
+            var vehicle = vehicles;
+            options.vehicleID = "123";
+            options.vehicle_id = "123";
+            options.tokens = "";
 
-            if (vehicle.state.toUpperCase() == "OFFLINE") {
+            if (vehicle.state && vehicle.state.toUpperCase() == "OFFLINE") {
                 console.log("\nResult: " + "Unable to contact vehicle, exiting!".bold.red);
                 return;
             }
 
             var carType = tjs.getModel(vehicle);
-            
-            console.log("\nVehicle " + vehicle.vin.green + " - " + carType.green + " ( '" + vehicle.display_name.cyan + "' ) is: " + vehicle.state.toUpperCase().bold.green);
+
+            console.log("\nVehicle " + process.env.VIN.toString().green + " - " + carType.toString().green + " ( '" + vehicle.vehicle_state.vehicle_name.toString().cyan + "' ) is: " + "online".toString().toUpperCase().bold.green);
 
             if (main) {
                 main(tjs, options);
             }
         });
-    }
-
-    this.run = function () {
-        try {
-            this.tokenFound = fs.statSync('.token').isFile();
-        } catch (e) {
-        }
-
-        if (program.uri) {
-            console.log("Setting portal URI to: " + program.uri);
-            tjs.setPortalBaseURI(program.uri);
-        }
-
-        if (this.tokenFound) {
-            var fileStr = fs.readFileSync('.token', 'utf8');
-            var token = JSON.parse(fileStr);
-
-            if (!token) {
-                program.help();
-            }
-
-            if (token.access_token) {
-                token = token.access_token;
-            }
-
-            this.login_cb(null, { error: false, authToken: token });
-        } else {
-            var username = program.username || process.env.TESLAJS_USER;
-            var password = program.password || process.env.TESLAJS_PASS;
-
-            if (!username || !password) {
-                program.help();
-            }
-
-            tjs.login(username, password, this.login_cb);
-        }
     }
 }
